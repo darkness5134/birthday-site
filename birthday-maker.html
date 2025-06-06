@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎉 Birthday Page Maker</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive;
+      text-align: center;
+      padding: 30px;
+      background: linear-gradient(135deg, #ffecd2, #fcb69f);
+      color: #333;
+    }
+    input, textarea, select, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 1em;
+      border-radius: 10px;
+      border: none;
+      width: 90%;
+      max-width: 400px;
+    }
+    .preview-img {
+      max-width: 300px;
+      border-radius: 20px;
+      margin-top: 20px;
+    }
+    .balloons {
+      font-size: 2.5rem;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 2em; }
+    }
+  </style>
+</head>
+<body onload="loadSavedData()">
+
+  <h1>🎉 Birthday Page Maker 🎉</h1>
+
+  <input type="text" id="nameInput" placeholder="Enter Name" onchange="saveData()"><br>
+  <textarea id="customMessage" rows="3" placeholder="Write your birthday message..." onchange="saveData()"></textarea><br>
+
+  <input type="file" id="imgInput" accept="image/*"><br>
+  <input type="file" id="musicInput" accept="audio/*"><br>
+
+  <img id="imgPreview" class="preview-img" src="" style="display:none"><br>
+
+  <select id="themeSelect" onchange="saveData()">
+    <option value="default">🌈 Default</option>
+    <option value="blue">💙 Cool Blue</option>
+    <option value="party">🎇 Party Lights</option>
+    <option value="dark">🖤 Dark Night</option>
+  </select><br>
+
+  <button onclick="generatePage()">🎁 Download My Birthday Page</button><br>
+
+  <audio id="clickSound" src="https://www.fesliyanstudios.com/play-mp3/4380" preload="auto"></audio>
+
+  <div class="balloons">🎈🎉🎈🎉🎈</div>
+
+  <p id="quoteArea"></p>
+
+  <p>
+    🌐 Share: 
+    <a id="shareBtn" href="#" target="_blank">WhatsApp</a>
+  </p>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <script>
+    const nameInput = document.getElementById('nameInput');
+    const msgInput = document.getElementById('customMessage');
+    const imgInput = document.getElementById('imgInput');
+    const musicInput = document.getElementById('musicInput');
+    const themeSelect = document.getElementById('themeSelect');
+    const clickSound = document.getElementById('clickSound');
+
+    let imgData = "", musicData = "";
+
+    const quotes = [
+      "🎂 Another year older, wiser, and cooler!",
+      "🎉 Eat cake. Repeat.",
+      "🎁 Wishing you a day full of love and laughter!",
+      "🎈 It's your day to shine!",
+      "✨ Make a wish and enjoy the magic!"
+    ];
+    document.getElementById('quoteArea').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+
+    imgInput.addEventListener('change', function () {
+      const file = this.files[0];
+      const reader = new FileReader();
+      reader.onload = function () {
+        imgData = reader.result;
+        document.getElementById('imgPreview').src = imgData;
+        document.getElementById('imgPreview').style.display = "block";
+        saveData();
+      };
+      if (file) reader.readAsDataURL(file);
+    });
+
+    musicInput.addEventListener('change', function () {
+      const file = this.files[0];
+      const reader = new FileReader();
+      reader.onload = function () {
+        musicData = reader.result;
+        saveData();
+      };
+      if (file) reader.readAsDataURL(file);
+    });
+
+    function saveData() {
+      localStorage.setItem("bday_name", nameInput.value);
+      localStorage.setItem("bday_msg", msgInput.value);
+      localStorage.setItem("bday_theme", themeSelect.value);
+    }
+
+    function loadSavedData() {
+      nameInput.value = localStorage.getItem("bday_name") || "";
+      msgInput.value = localStorage.getItem("bday_msg") || "";
+      themeSelect.value = localStorage.getItem("bday_theme") || "default";
+    }
+
+    function generatePage() {
+      clickSound.play();
+      confetti();
+
+      const name = nameInput.value || "My Friend";
+      const message = msgInput.value || "Wishing you a joyful day!";
+      const theme = themeSelect.value;
+
+      const themes = {
+        default: "linear-gradient(135deg, #f6d365, #fda085)",
+        blue: "linear-gradient(135deg, #a1c4fd, #c2e9fb)",
+        party: "linear-gradient(135deg, #fc466b, #3f5efb)",
+        dark: "linear-gradient(135deg, #232526, #414345)"
+      };
+
+      const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Happy Birthday ${name}</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive;
+      background: ${themes[theme]};
+      text-align: center;
+      color: white;
+      padding: 40px;
+    }
+    h1 { font-size: 3em; margin: 20px; }
+    img { max-width: 90%; border-radius: 20px; }
+    audio { margin-top: 30px; }
+    .balloons { font-size: 2.5rem; animation: float 3s ease-in-out infinite; }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="balloons">🎉🎈🎂🎊</div>
+  <h1>Happy Birthday, ${name}!</h1>
+  <p>${message}</p>
+  ${imgData ? `<img src="${imgData}" alt="Photo">` : ""}
+  ${musicData ? `<audio autoplay loop controls src="${musicData}"></audio>` : ""}
+  <div class="balloons">🎁🎂🎈</div>
+</body>
+</html>`;
+
+      const blob = new Blob([html], { type: "text/html" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `birthday-${name.replace(/\s+/g, "_").toLowerCase()}.html`;
+      link.click();
+
+      const shareText = `Make a birthday page for ${name}! 🥳`;
+      document.getElementById("shareBtn").href =
+        `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+    }
+  </script>
+
+</body>
+</html>
